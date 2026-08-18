@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'registerPage.dart';
+import 'homePage.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -11,8 +12,12 @@ class Loginpage extends StatefulWidget {
 
 class _LoginpageState extends State<Loginpage> {
   bool rememberMe = false;
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+
+  final TextEditingController _usernameController =
+      TextEditingController();
+
+  final TextEditingController _passwordController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -20,14 +25,17 @@ class _LoginpageState extends State<Loginpage> {
     _loadRememberedData();
   }
 
+  // Mengambil data Remember Me
   Future<void> _loadRememberedData() async {
     final prefs = await SharedPreferences.getInstance();
+
     final savedRememberMe = prefs.getBool('rememberMe') ?? false;
     final savedUsername = prefs.getString('username') ?? '';
     final savedPassword = prefs.getString('password') ?? '';
 
     setState(() {
       rememberMe = savedRememberMe;
+
       if (savedRememberMe) {
         _usernameController.text = savedUsername;
         _passwordController.text = savedPassword;
@@ -35,12 +43,20 @@ class _LoginpageState extends State<Loginpage> {
     });
   }
 
+  // Menyimpan data Remember Me
   Future<void> _saveRememberedData() async {
     final prefs = await SharedPreferences.getInstance();
+
     if (rememberMe) {
       await prefs.setBool('rememberMe', true);
-      await prefs.setString('username', _usernameController.text);
-      await prefs.setString('password', _passwordController.text);
+      await prefs.setString(
+        'username',
+        _usernameController.text,
+      );
+      await prefs.setString(
+        'password',
+        _passwordController.text,
+      );
     } else {
       await prefs.setBool('rememberMe', false);
       await prefs.remove('username');
@@ -58,17 +74,22 @@ class _LoginpageState extends State<Loginpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28),
+
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 30),
 
+              // Image
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
+
                   child: Image.network(
                     "https://i.pinimg.com/1200x/c8/3d/0a/c83d0a804b5194e8352e44fa0383c09b.jpg",
                     width: 260,
@@ -80,6 +101,7 @@ class _LoginpageState extends State<Loginpage> {
 
               const SizedBox(height: 35),
 
+              // Title
               const Text(
                 "Login",
                 style: TextStyle(
@@ -101,12 +123,13 @@ class _LoginpageState extends State<Loginpage> {
 
               const SizedBox(height: 30),
 
+              // Username
               const Text(
                 "Username",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white70,
+                  color: Colors.black87,
                 ),
               ),
 
@@ -114,8 +137,10 @@ class _LoginpageState extends State<Loginpage> {
 
               TextField(
                 controller: _usernameController,
+
                 decoration: const InputDecoration(
                   hintText: "Masukan Username",
+
                   prefixIcon: Icon(
                     Icons.person_outline,
                     color: Color(0xFFE10600),
@@ -125,12 +150,13 @@ class _LoginpageState extends State<Loginpage> {
 
               const SizedBox(height: 18),
 
+              // Password
               const Text(
                 "Password",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white70,
+                  color: Colors.black87,
                 ),
               ),
 
@@ -139,12 +165,15 @@ class _LoginpageState extends State<Loginpage> {
               TextField(
                 controller: _passwordController,
                 obscureText: true,
+
                 decoration: const InputDecoration(
                   hintText: "Masukan Password",
+
                   prefixIcon: Icon(
                     Icons.lock_outline,
                     color: Color(0xFFE10600),
                   ),
+
                   suffixIcon: Icon(
                     Icons.remove_red_eye_outlined,
                     color: Colors.grey,
@@ -154,50 +183,66 @@ class _LoginpageState extends State<Loginpage> {
 
               const SizedBox(height: 8),
 
+              // Remember Me
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
+
                 activeColor: const Color(0xFFE10600),
+
                 checkColor: Colors.white,
+
                 title: const Text(
                   "Remember Me",
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.black87,
                   ),
                 ),
+
                 value: rememberMe,
+
                 onChanged: (value) {
                   setState(() {
                     rememberMe = value ?? false;
                   });
                 },
-                controlAffinity: ListTileControlAffinity.leading,
+
+                controlAffinity:
+                    ListTileControlAffinity.leading,
               ),
 
               const SizedBox(height: 15),
 
+              // Sign In
               SizedBox(
                 width: double.infinity,
                 height: 52,
+
                 child: ElevatedButton(
                   onPressed: () async {
-                    final messenger = ScaffoldMessenger.of(context);
                     await _saveRememberedData();
+
                     if (!mounted) return;
-                    if (rememberMe) {
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text("Remember Me aktif - Data tersimpan"),
-                        ),
-                      );
-                    } else {
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text("Login berhasil"),
-                        ),
-                      );
-                    }
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const HomePage(),
+                      ),
+                    );
                   },
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE10600),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+
                   child: const Text(
                     "Sign In",
                     style: TextStyle(
@@ -210,8 +255,11 @@ class _LoginpageState extends State<Loginpage> {
 
               const SizedBox(height: 22),
 
+              // Sign Up
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment:
+                    MainAxisAlignment.center,
+
                 children: [
                   const Text(
                     "Don't Have Account?",
@@ -219,15 +267,18 @@ class _LoginpageState extends State<Loginpage> {
                       color: Colors.grey,
                     ),
                   ),
+
                   TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const RegisterPage(),
+                          builder: (context) =>
+                              const RegisterPage(),
                         ),
                       );
                     },
+
                     child: const Text(
                       "Sign Up",
                       style: TextStyle(
